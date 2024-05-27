@@ -20,7 +20,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            By {" "}
+            By Masum Billa{" "}
             <Image
               src="/vercel.svg"
               alt="Vercel Logo"
