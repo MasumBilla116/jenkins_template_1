@@ -2,37 +2,43 @@ pipeline {
     agent any
 
     environment {
-        APP_DIR = '/var/www/jenkprojects'
+        APP_DIR = '/var/www/jenkins'
         DOMAIN = 'jenkinslive.com'
         PORT = '6060'
     }
 
     stages {
-        // stage('Checkout') {
-        //     steps {
-        //         // Checkout the source code from the repository
-        //         checkout scm
-        //     }
-        // }
+        stage('Checkout') {
+            steps {
+                // Checkout the source code from the repository
+                checkout scm
+            }
+        }
 
         stage('Install Dependencies') {
             steps {
-                // Install project dependencies
-                sh 'npm install'
+                dir('path/to/your/project') { // Specify the directory if package.json is not at the root
+                    // Install project dependencies
+                    sh 'npm install'
+                }
             }
         }
 
         stage('Build') {
             steps {
-                // Build the Next.js project
-                sh 'npm run build'
+                dir('path/to/your/project') { // Specify the directory if necessary
+                    // Build the Next.js project
+                    sh 'npm run build'
+                }
             }
         }
 
         stage('Export') {
             steps {
-                // Export the Next.js project
-                sh 'npm run export'
+                dir('path/to/your/project') { // Specify the directory if necessary
+                    // Export the Next.js project
+                    sh 'npm run export'
+                }
             }
         }
 
@@ -41,7 +47,7 @@ pipeline {
                 // Copy the build files to the deployment directory
                 sh '''
                     sudo rm -rf $APP_DIR/*
-                    sudo cp -r out/* $APP_DIR/
+                    sudo cp -r path/to/your/project/out/* $APP_DIR/
                 '''
             }
         }
@@ -57,19 +63,19 @@ pipeline {
 
                         location / {
                             root $APP_DIR;
-                            try_files \$uri /index.html;
+                            try_files $uri /index.html;
                         }
 
                         location /_next/ {
                             root $APP_DIR;
-                            try_files \$uri /index.html;
+                            try_files $uri /index.html;
                         }
                     }
                     EOF
 
-                    sudo ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/
+                    sudo ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/ || true
                     sudo nginx -t
-                    sudo systemctl restart nginx
+                    sudo systemctl reload nginx
                 '''
             }
         }
@@ -100,5 +106,3 @@ pipeline {
         }
     }
 }
-
-
