@@ -8,12 +8,12 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                // Checkout the source code from the repository
-                checkout scm
-            }
-        }
+        // stage('Checkout') {
+        //     steps {
+        //         // Checkout the source code from the repository
+        //         checkout scm
+        //     }
+        // }
 
         stage('Install Dependencies') {
             steps {
