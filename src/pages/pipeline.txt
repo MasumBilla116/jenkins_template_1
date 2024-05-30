@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    environment {
+        NEXTJS_PROJECT_ID = "project1"
+        NEXTJS_DIR = "/var/www/jenkprojects/jenkins_template_1"
+        PORT = 6060
+        DOMAIN = "jenkinslive.com"
+    }
+
+    stages {
+        stage('Prepare Environment') {
+            steps {
+                script {
+                    // Ensure the target directory exists and clean it if necessary
+                    sh """
+                        rm -rf ${NEXTJS_DIR}
+                        mkdir -p ${NEXTJS_DIR}
+                    """
+                }
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    credentialsId: 'bdea73c9-0238-41c1-9db0-c321d8c8f3ca',
+                    url: 'https://github.com/MasumBilla116/jenkins_template_1.git'
+            }
+        }
+
+        stage('Move Project to Target Directory') {
+            steps {
+                script {
+                    sh """
+                        cp -r \$(pwd)/* ${NEXTJS_DIR}
+                    """
+                }
+            }
+        }
+
+        stage('Project Dependency Install') {
+            steps {
+                dir("${NEXTJS_DIR}") {
+                    sh "npm install"
+                }
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                dir("${NEXTJS_DIR}") {
+                    sh "npm run build"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed!'
+        }
+    }
+}
